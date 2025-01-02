@@ -38,6 +38,7 @@ dependencies:
   tflite_flutter: ^0.11.0
   image: ^3.0.1
   image_picker: ^0.8.7
+  image_cropper: ^8.1.0
 
 dev_dependencies:
   flutter_test:

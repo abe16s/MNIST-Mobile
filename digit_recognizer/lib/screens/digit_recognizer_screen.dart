@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../services/model_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class DigitRecognizerScreen extends StatefulWidget {
   const DigitRecognizerScreen({super.key});
@@ -22,6 +23,34 @@ class _DigitRecognizerScreenState extends State<DigitRecognizerScreen> {
     _modelService.loadModel();
   }
 
+  /// Crop the selected image
+  Future<File?> _cropImage(File imageFile) async {
+    try {
+      final CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: imageFile.path,
+        // cropStyle: CropStyle.rectangle, // Define the cropping style
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Edit Image',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+          ),
+          IOSUiSettings(
+            title: 'Edit Image',
+          ),
+        ],
+      );
+      return croppedFile != null ? File(croppedFile.path) : null;
+    } catch (e) {
+      print("Error cropping image: $e");
+      return null;
+    }
+  }
+
+
+  /// Predict the digit from the image
   Future<void> _predictFromImage(File imageFile) async {
     String result = await _modelService.predictDigitFromFile(imageFile);
     setState(() {
@@ -30,22 +59,30 @@ class _DigitRecognizerScreenState extends State<DigitRecognizerScreen> {
     });
   }
 
+  /// Handle image upload with cropping
   Future<void> _uploadImage() async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
-        await _predictFromImage(File(image.path));
+        File? croppedImage = await _cropImage(File(image.path));
+        if (croppedImage != null) {
+          await _predictFromImage(croppedImage);
+        }
       }
     } catch (e) {
       print("Error picking image: $e");
     }
   }
 
+  /// Handle image capture with cropping
   Future<void> _captureImage() async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
       if (image != null) {
-        await _predictFromImage(File(image.path));
+        File? croppedImage = await _cropImage(File(image.path));
+        if (croppedImage != null) {
+          await _predictFromImage(croppedImage);
+        }
       }
     } catch (e) {
       print("Error capturing image: $e");

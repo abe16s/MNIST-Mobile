@@ -15,6 +15,8 @@ class _DigitRecognizerScreenState extends State<DigitRecognizerScreen> {
   final ModelService _modelService = ModelService();
   String prediction = "No Prediction";
   File? selectedImage;
+  bool _loading = false;
+
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -100,37 +102,110 @@ class _DigitRecognizerScreenState extends State<DigitRecognizerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Digit Recognizer'),
+        backgroundColor: Colors.blueAccent,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (selectedImage != null)
-              Image.file(selectedImage!, width: 200)
-            else
-              const Text("No image selected"),
-            const SizedBox(height: 16),
-            const Text('Prediction Result:'),
-            const SizedBox(height: 16),
-            Text(prediction, style: const TextStyle(fontSize: 20)),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _uploadImage,
-                  child: const Text("Upload Image"),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: _captureImage,
-                  child: const Text("Capture Image"),
-                ),
-              ],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/background_image.jpg',
+              fit: BoxFit.cover,
             ),
-          ],
-        ),
-      ),
+          ),
+        
+      
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                selectedImage == null
+                    ? Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text("No image selected"),
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(
+                          selectedImage!,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                SizedBox(height: 20),
+                Text(
+                  prediction,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _captureImage,
+                      icon: Icon(Icons.camera_alt),
+                      label: Text("Camera"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _uploadImage,
+                      icon: Icon(Icons.photo_library),
+                      label: Text("Gallery"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.greenAccent,
+                      ),
+                    ),
+                  ],
+                ),
+                if (_loading) ...[
+                  SizedBox(height: 20),
+                  CircularProgressIndicator(),
+                ]
+              ],
+              // [
+              //   // ElevatedButton(
+              //   //   onPressed: _uploadImage,
+              //   //   child: const Text("Upload Image"),
+              //   // ),
+              //   ElevatedButton.icon(
+              //     onPressed: _uploadImage,
+              //     icon: Icon(Icons.camera_alt),
+              //     label: Text("Camera"),
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.blueAccent,
+              //     ),
+              //   ),
+              //   const SizedBox(width: 16),
+              //   // ElevatedButton(
+              //   //   onPressed: _captureImage,
+              //   //   child: const Text("Capture Image"),
+              //   // ),
+              //   ElevatedButton.icon(
+              //     onPressed: _captureImage,
+              //     icon: Icon(Icons.photo_library),
+              //     label: Text("Gallery"),
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.greenAccent,
+              //     ),
+              //   ),
+              // ],
+            ),
+          
+        
+      ),])
     );
   }
 }

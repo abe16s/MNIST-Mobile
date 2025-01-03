@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 class ImageProcessingService {
-  /// Preprocess the image: convert to grayscale, resize, and normalize
   static List<List<List<List<double>>>> preprocessImage(Uint8List imageBytes) {
     img.Image? originalImage = img.decodeImage(imageBytes);
     if (originalImage == null) {
@@ -12,25 +11,43 @@ class ImageProcessingService {
     // Convert to grayscale
     img.Image grayImage = img.grayscale(originalImage);
 
-    // Resize to 28x28
-    img.Image resizedImage = img.copyResize(grayImage, width: 28, height: 28);
+    // Apply binary thresholding
+    img.Image binaryImage = img.Image.from(grayImage);
+    for (int y = 0; y < binaryImage.height; y++) {
+      for (int x = 0; x < binaryImage.width; x++) {
+        int pixel = binaryImage.getPixel(x, y);
+        int grayscaleValue = img.getLuminance(pixel);
+        if (grayscaleValue > 128) {
+          binaryImage.setPixel(x, y, img.getColor(255, 255, 255));
+        } else {
+          binaryImage.setPixel(x, y, img.getColor(0, 0, 0));
+        }
+      }
+    }
 
-    // Normalize pixel values to [0, 1] and add batch dimension
-    return [List.generate(
-      28,
-      (y) => List.generate(
+    // Resize to fit 20x20 while preserving aspect ratio
+    img.Image resizedImage = img.copyResize(binaryImage, width: 20, height: 20);
+
+    // Add padding to center the digit in a 28x28 canvas
+    img.Image paddedImage = img.Image(28, 28);
+    img.fill(paddedImage, img.getColor(255, 255, 255)); // Set background to white
+    int xOffset = (28 - resizedImage.width) ~/ 2;
+    int yOffset = (28 - resizedImage.height) ~/ 2;
+    img.drawImage(paddedImage, resizedImage, dstX: xOffset, dstY: yOffset);
+
+    // Normalize pixel values
+    return [
+      List.generate(
         28,
-        (x) {
-          int pixel = resizedImage.getPixel(x, y);
-          int r = img.getRed(pixel);
-          int g = img.getGreen(pixel);
-          int b = img.getBlue(pixel);
-
-          // Grayscale value = (0.3 * R + 0.59 * G + 0.11 * B)
-          double grayscale = (0.3 * r + 0.59 * g + 0.11 * b) / 255.0;
-          return [grayscale];
-        },
-      ),
-    )];
+        (y) => List.generate(
+          28,
+          (x) {
+            int pixel = paddedImage.getPixel(x, y);
+            int grayscaleValue = img.getLuminance(pixel);
+            return [1.0 - (grayscaleValue / 255.0)]; // Invert: white digits on black
+          },
+        ),
+      )
+    ];
   }
 }

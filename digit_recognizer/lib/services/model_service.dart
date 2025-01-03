@@ -9,7 +9,7 @@ class ModelService {
   /// Load the TFLite model
   Future<void> loadModel() async {
     try {
-      _interpreter = await Interpreter.fromAsset('assets/best_model.tflite');
+      _interpreter = await Interpreter.fromAsset('assets/blood_sweat_tears.tflite');
       print("Model loaded successfully");
     } catch (e) {
       print("Error loading model: $e");

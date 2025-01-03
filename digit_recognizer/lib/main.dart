@@ -1,6 +1,5 @@
 import 'package:digit_recognizer/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'screens/digit_recognizer_screen.dart';
 
 void main() => runApp(const MyApp());
 

@@ -1,3 +1,4 @@
+import 'package:digit_recognizer/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/digit_recognizer_screen.dart';
 
@@ -10,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const DigitRecognizerScreen(),
+      home: SplashScreen(),
     );
   }
 }

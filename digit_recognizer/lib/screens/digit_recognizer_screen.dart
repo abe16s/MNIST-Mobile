@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/model_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'dart:ui'; 
 
 class DigitRecognizerScreen extends StatefulWidget {
   const DigitRecognizerScreen({super.key});
@@ -107,9 +108,15 @@ class _DigitRecognizerScreenState extends State<DigitRecognizerScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'assets/background_image.jpg',
-              fit: BoxFit.cover,
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Opacity(
+                opacity: 0.5, // Adjust the opacity value as needed
+                child: Image.asset(
+                  'assets/background_image.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
         
